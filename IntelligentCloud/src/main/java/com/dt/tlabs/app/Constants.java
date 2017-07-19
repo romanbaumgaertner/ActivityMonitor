@@ -233,6 +233,9 @@ public class Constants {
 	public static final String cIC_DEVICEID = "deviceId";
 	public static final String cIC_TS = "ts";
 	public static final String cIC_TOKEN = "token";
+	public static final String cIC_VERSION = "version";
+	public static final String cIC_TYPE = "type";
+	public static final String cIC_NETWORK = "network";
 	
 	public static final String cIC_ACC="accelerometer";
 	public static final String cIC_GYR="gyroscope";

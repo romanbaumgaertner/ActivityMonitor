@@ -7,12 +7,14 @@ import java.security.cert.X509Certificate;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
+import java.util.regex.Pattern;
 
 import javax.net.ssl.SSLContext;
 import javax.net.ssl.TrustManager;
 import javax.net.ssl.X509TrustManager;
 
 import org.bson.Document;
+import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 
@@ -75,11 +77,17 @@ public class MongoDb implements DbBase{
 		Document entry = new Document();
 
 		if(sensorData != null ){
+			
 			try {
 				
 				JSONObject hdr = sensorData.getJSONObject(Constants.cIC_HDR);
+				//JSONArray acc = sensorData.getJSONArray(Constants.cIC_ACC);
 				String acc = sensorData.getString(Constants.cIC_ACC);
-				String gyr = sensorData.getString(Constants.cIC_GYR);
+				JSONArray gyr = sensorData.getJSONArray(Constants.cIC_GYR);
+				
+				Logging.sLOGGER(MongoDb.class).warn(hdr.toString());
+				Logging.sLOGGER(MongoDb.class).warn(acc.toString());
+				Logging.sLOGGER(MongoDb.class).warn(gyr.toString());
 				
 				entry.append(
 						Constants.cIC_HDR, new Document().
@@ -87,7 +95,7 @@ public class MongoDb implements DbBase{
 							append(Constants.cIC_TS, hdr.getLong(Constants.cIC_TS) ) 
 							).
 					append(Constants.cIC_ACC, acc).
-					append(Constants.cIC_GYR, gyr);
+					append(Constants.cIC_GYR, gyr.toString().replace(Pattern.quote("\\"), ""));
 				
 				MongoCollection<Document> collection = db.getCollection(this.mongoConfig.getCollection() );
 				collection.insertOne(entry);

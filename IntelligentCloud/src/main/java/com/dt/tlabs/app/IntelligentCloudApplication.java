@@ -1,6 +1,7 @@
+
+
 package com.dt.tlabs.app;
 
-import java.io.BufferedReader;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
@@ -21,7 +22,6 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
-import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 import com.dt.tlabs.db.DbApplication;
@@ -383,36 +383,34 @@ public class IntelligentCloudApplication {
 		}
 		
 		@RequestMapping(method = RequestMethod.GET, value ="/network/last")
-		String networkLast() {
-			return "last";
+		ResponseEntity<?>  networkLast() {
+			
+			ResponseEntity<String> responseEntity = new ResponseEntity<String>(getNetworkResponse(),  HttpStatus.OK); 
+			return responseEntity;
 		}
 	}
 	
-	/*
-	public void getRestRequest(){
-		StringBuffer jb = new StringBuffer();
-		String line = null;
-
+	///////////
+	// Helper
+	//////////
+	public String getNetworkResponse(){
+		
+		JSONObject response = new JSONObject();
+		JSONObject hdrContents = new JSONObject();
 		try {
-
-			BufferedReader reader = req.getReader();
-			while ((line = reader.readLine()) != null)
-				jb.append(line);
-
-		} catch (IOException e) {
-			LOG_DEBUG.error("UpdataServlet - received heartbeat - " +e.getMessage());
-		} finally {
-			if (jb.length() == 0)
-
-				// not able to read the params, invalid request
-				isSuccessful = true;
-			else {
-
-				//parse the request
-				pojo = parseRequestParams(jb.toString());
-			}
+			hdrContents.put(Constants.cIC_VERSION, "1");
+			hdrContents.put(Constants.cIC_TYPE, "1");
+			
+			response.put(Constants.cIC_HDR, hdrContents);
+			response.put(Constants.cIC_NETWORK, Constants.cIC_NETWORK);
+			
+		} catch (JSONException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
 		}
-	}*/
+		
+		return response.toString();
+	}
 	
 	
 }
