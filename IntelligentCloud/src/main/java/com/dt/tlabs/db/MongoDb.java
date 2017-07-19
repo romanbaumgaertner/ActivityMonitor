@@ -81,8 +81,8 @@ public class MongoDb implements DbBase{
 			try {
 				
 				JSONObject hdr = sensorData.getJSONObject(Constants.cIC_HDR);
-				//JSONArray acc = sensorData.getJSONArray(Constants.cIC_ACC);
-				String acc = sensorData.getString(Constants.cIC_ACC);
+				JSONArray acc = sensorData.getJSONArray(Constants.cIC_ACC);
+				//String acc = sensorData.getString(Constants.cIC_ACC);
 				JSONArray gyr = sensorData.getJSONArray(Constants.cIC_GYR);
 				
 				Logging.sLOGGER(MongoDb.class).warn(hdr.toString());
@@ -94,8 +94,8 @@ public class MongoDb implements DbBase{
 							append(Constants.cIC_DEVICEID, hdr.getString(Constants.cIC_DEVICEID) ).
 							append(Constants.cIC_TS, hdr.getLong(Constants.cIC_TS) ) 
 							).
-					append(Constants.cIC_ACC, acc).
-					append(Constants.cIC_GYR, gyr.toString().replace(Pattern.quote("\\"), ""));
+					append(Constants.cIC_ACC, acc.toString()).
+					append(Constants.cIC_GYR, gyr.toString());
 				
 				MongoCollection<Document> collection = db.getCollection(this.mongoConfig.getCollection() );
 				collection.insertOne(entry);
