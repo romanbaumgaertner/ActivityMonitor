@@ -1,7 +1,11 @@
 package com.dt.tlabs.app;
 
+import java.io.File;
+import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Comparator;
 import java.util.List;
 import java.util.Map;
 import java.util.regex.Matcher;
@@ -386,17 +390,31 @@ public class IntelligentCloudApplication {
 		@ResponseBody
 		FileSystemResource  networkLast() {
 			
-			FileSystemResource fsr = getFileSystemResource("last");
+			String fileName = getLatest();
+			
+			FileSystemResource fsr = getFileSystemResource(fileName);
+			
+			if(!fsr.exists()){
+				Logging.sLOGGER(IntelligentCloudApplication.class).warn("file does not exist!");
+				
+				fsr = null;
+			}
 
-			ResponseEntity<String> responseEntity = new ResponseEntity<String>(getNetworkResponse(),  HttpStatus.OK); 
+			//ResponseEntity<String> responseEntity = new ResponseEntity<String>(getNetworkResponse(),  HttpStatus.OK); 
 			return fsr;
 		}
 
-		@RequestMapping(value = "/network/{file_name}", method = RequestMethod.GET)
+		@RequestMapping(value = "/network/{file_name:.+}", method = RequestMethod.GET)
 		@ResponseBody
-		public FileSystemResource getFile(@PathVariable("file_name") String fileName) {
+		public FileSystemResource getFile(@PathVariable("file_name") String fileName) throws FileNotFoundException {
 
 			FileSystemResource fsr = getFileSystemResource(fileName);
+			
+			if(!fsr.exists()){
+				Logging.sLOGGER(IntelligentCloudApplication.class).warn("file does not exist!");
+				
+				fsr = null;
+			}
 
 			return fsr;
 
@@ -429,12 +447,34 @@ public class IntelligentCloudApplication {
 		String fileSystemResourcePath = "NWS/"+name;
 		FileSystemResource fileSystemResource = new FileSystemResource(fileSystemResourcePath);     
 
-		if (! fileSystemResource.exists()) {
+		if (fileSystemResource.exists()) {
 			Logging.sLOGGER(IntelligentCloudApplication.class).debug("Got file");
 		}
 		
 		return fileSystemResource;
 	}
 
-
+	/**
+	 * Gets the file which was modified the last
+	 * @return
+	 */
+	public String getLatest(){
+		File fileName = null;
+		
+		File fileDir = new File("NWS");
+		
+		fileName = getLastModifiedFile(fileDir);
+		
+		return fileName.getName();
+	}
+	
+	public File getLastModifiedFile(File directory) {
+	    File[] files = directory.listFiles();
+	   if (files.length == 0) return null;
+	    Arrays.sort(files, new Comparator<File>() {
+	        public int compare(File o1, File o2) {
+	            return new Long(o2.lastModified()).compareTo(o1.lastModified()); 
+	        }});
+	    return files[0];
+	}
 }
