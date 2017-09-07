@@ -1,7 +1,9 @@
 package com.dt.tlabs.app;
 
+import java.io.BufferedWriter;
 import java.io.File;
 import java.io.FileNotFoundException;
+import java.io.FileWriter;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -403,6 +405,30 @@ public class IntelligentCloudApplication {
 			//ResponseEntity<String> responseEntity = new ResponseEntity<String>(getNetworkResponse(),  HttpStatus.OK); 
 			return fsr;
 		}
+		
+		@RequestMapping(value = "/network/{file_name:.+}", method = RequestMethod.PUT)
+		ResponseEntity<?> networkUpload(@PathVariable("file_name") String fileName, @RequestBody String data){
+			
+			JSONObject dataJson;
+			boolean isSuccessful = false;
+			
+			try {
+				dataJson = new JSONObject(data);
+
+				Logging.sLOGGER(IntelligentCloudApplication.class).warn( dataJson.toString());
+				
+				isSuccessful = writeNetwork(dataJson.toString(), fileName );
+
+			} catch (JSONException e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+			} 
+
+			ResponseEntity<String> responseEntity = new ResponseEntity<String>("network upload",  HttpStatus.OK); 
+
+			return responseEntity;
+		}
+
 
 		@RequestMapping(value = "/network/{file_name:.+}", method = RequestMethod.GET)
 		@ResponseBody
@@ -476,5 +502,45 @@ public class IntelligentCloudApplication {
 	            return new Long(o2.lastModified()).compareTo(o1.lastModified()); 
 	        }});
 	    return files[0];
+	}
+	
+	public boolean writeNetwork(String content, String fileName){
+		boolean isSuccessful = false;
+		
+		String filePath = "NWS/" + fileName;
+		
+		BufferedWriter bw = null;
+		FileWriter fw = null;
+
+		try {
+
+			fw = new FileWriter(filePath);
+			bw = new BufferedWriter(fw);
+			bw.write(content);
+
+			isSuccessful = true;
+
+		} catch (IOException e) {
+
+			e.printStackTrace();
+
+		} finally {
+
+			try {
+
+				if (bw != null)
+					bw.close();
+
+				if (fw != null)
+					fw.close();
+
+			} catch (IOException ex) {
+
+				ex.printStackTrace();
+
+			}
+	
+		}
+		return isSuccessful;
 	}
 }
